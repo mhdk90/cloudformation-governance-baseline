@@ -1,36 +1,32 @@
 # Infrastructure Governance with CloudFormation
 
 ## Overview
-This project demonstrates a reusable CloudFormation governance baseline with secure-by-default S3 settings and least-privilege IAM controls.
+Reusable CloudFormation governance baseline with secure-by-default S3 configuration and least-privilege IAM controls.
 
 ## Goal
-Show how infrastructure governance can be standardized through YAML-based Infrastructure as Code.
+Standardize core governance controls through YAML-based Infrastructure as Code.
 
 ## Current Scope
-- Secure S3 bucket
+- Secure S3 baseline
+- Public access block
 - Default encryption
-- Block public access
-- Bucket versioning
-- Least-privilege IAM policy
-- Read-only audit role
+- Versioning
+- Least-privilege IAM role/policy
 
 ## Repository Structure
-- `cloudformation/` – CloudFormation YAML templates
-- `docs/` – notes and architecture explanations
+- `cloudformation/` – templates
+- `docs/` – design notes and architecture
+
+## Deployment
+Add your deploy command here.
 
 ## Security Notes
 - No secrets are stored in this repository
-- Environment-specific values should be passed as parameters
+- Environment-specific values are parameterized
 - Public access is blocked by design
 
-## Planned Next Steps
+## Roadmap
 - Add CloudTrail baseline
-- Add StackSet version for multi-account rollout
+- Add StackSet version
+- Add CI
 - Add architecture diagram
-- Add design decisions
-
-## What I Learned
-- How to define governance controls in YAML
-- How to apply secure-by-default S3 settings
-- How to design least-privilege IAM access
-- How to present infrastructure governance work on GitHub
