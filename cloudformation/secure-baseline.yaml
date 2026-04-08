@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Governance baseline with secure S3 bucket and least-privilege IAM role
+Description: Secure baseline with S3 bucket, read-only policy, and audit role
 
 Parameters:
   ProjectName:
@@ -8,9 +8,11 @@ Parameters:
 
   AuditPrincipalArn:
     Type: String
-    Description: ARN of the trusted principal that can assume the audit role
+    Description: ARN of the trusted principal allowed to assume the audit role
 
 Resources:
+
+  # 1) Secure storage
   GovernanceBucket:
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
@@ -35,11 +37,12 @@ Resources:
         - Key: ManagedBy
           Value: CloudFormation
 
+  # 2) Read-only access policy for that bucket
   GovernanceBucketReadPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      ManagedPolicyName: !Sub '${ProjectName}-s3-readonly'
-      Description: Least-privilege read-only access to governance bucket
+      ManagedPolicyName: !Sub '${AWS::Region}-${ProjectName}-s3-readonly'
+      Description: Read-only access to the governance bucket
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -49,16 +52,18 @@ Resources:
               - s3:ListBucket
               - s3:GetBucketLocation
             Resource: !GetAtt GovernanceBucket.Arn
+
           - Sid: ReadObjects
             Effect: Allow
             Action:
               - s3:GetObject
             Resource: !Sub '${GovernanceBucket.Arn}/*'
 
+  # 3) Role trusted by one external principal
   GovernanceAuditRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub '${ProjectName}-audit-role'
+      RoleName: !Sub '${AWS::Region}-${ProjectName}-audit-role'
       Description: Read-only audit role for governance bucket
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -71,6 +76,8 @@ Resources:
       ManagedPolicyArns:
         - !Ref GovernanceBucketReadPolicy
       Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-audit-role'
         - Key: Purpose
           Value: governance-audit
         - Key: ManagedBy
